@@ -7,11 +7,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #f0f4f8; --card: #ffffff; --text: #1a2636; --muted: #5a6e84;
-  --border: rgba(0,0,0,0.07); --shadow: 0 2px 16px rgba(0,0,0,0.06);
-  --blue: #378ADD; --red: #E24B4A; --teal: #1D9E75; --amber: #BA7517;
-  --blue-light: #E6F1FB; --red-light: #FCEBEB; --teal-light: #E1F5EE; --amber-light: #FAEEDA;
-  --blue-dark: #0C447C; --red-dark: #791F1F; --teal-dark: #085041; --amber-dark: #633806;
+  --bg:#f0f4f8;--card:#ffffff;--text:#1a2636;--muted:#5a6e84;
+  --border:rgba(0,0,0,0.07);--shadow:0 2px 16px rgba(0,0,0,0.06);
+  --blue:#378ADD;--red:#E24B4A;--teal:#1D9E75;--amber:#BA7517;
+  --blue-light:#E6F1FB;--red-light:#FCEBEB;--teal-light:#E1F5EE;--amber-light:#FAEEDA;
+  --blue-dark:#0C447C;--red-dark:#791F1F;--teal-dark:#085041;--amber-dark:#633806;
 }
 @media(prefers-color-scheme:dark){
   :root{
@@ -28,86 +28,104 @@ body{font-family:'Sarabun','Noto Sans Thai',sans-serif;background:var(--bg);colo
 /* HEADER */
 .header{
   background:linear-gradient(135deg,#042C53 0%,#0C447C 55%,#185FA5 100%);
-  padding:1.25rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
 }
 .header-left{display:flex;align-items:center;gap:12px;}
-.header-icon{width:46px;height:46px;background:rgba(255,255,255,0.13);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.header-icon{width:46px;height:46px;background:rgba(255,255,255,0.13);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .h-title{color:#fff;font-size:18px;font-weight:600;line-height:1.3;}
-.h-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:2px;}
+.h-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:3px;}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .status-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border-radius:20px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,0.85);}
-.dot{width:7px;height:7px;border-radius:50%;background:#5DCAA5;}
+.dot{width:7px;height:7px;border-radius:50%;background:#5DCAA5;flex-shrink:0;}
 .dot.loading{background:#EF9F27;animation:blink 1s infinite;}
 .dot.error{background:#E24B4A;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.last-upd{font-size:11px;color:rgba(255,255,255,0.45);}
 
 /* LAYOUT */
 .wrap{max-width:1280px;margin:0 auto;padding:1.25rem 1.5rem;}
 
+/* SOURCE TAG */
+.source-tag{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;margin-bottom:1rem;
+}
+.source-tag span{font-weight:600;color:var(--blue);}
+
+/* ERROR BOX */
+.err-box{background:var(--amber-light);border:1px solid rgba(186,117,23,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber-dark);margin-bottom:1rem;display:none;line-height:1.6;}
+.err-box a{color:inherit;font-weight:600;}
+
 /* STATION SECTIONS */
 .stations{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
 @media(max-width:860px){.stations{grid-template-columns:1fr;}}
-
-.stn-header{
-  border-radius:12px 12px 0 0;padding:10px 16px;
-  display:flex;align-items:center;gap:10px;
-}
+.stn-block{border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);}
+.stn-header{padding:10px 16px;display:flex;align-items:center;gap:10px;}
 .stn-header.n64{background:var(--blue-light);}
 .stn-header.n1{background:var(--red-light);}
-.stn-dot{width:10px;height:10px;border-radius:50%;}
+.stn-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .stn-dot.n64{background:var(--blue);}
 .stn-dot.n1{background:var(--red);}
-.stn-name{font-size:14px;font-weight:600;color:var(--blue-dark);}
+.stn-name{font-size:14px;font-weight:600;}
+.stn-name.n64{color:var(--blue-dark);}
 .stn-name.n1{color:var(--red-dark);}
 .stn-code{font-size:11px;color:var(--muted);margin-left:auto;}
 
-.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;box-shadow:var(--shadow);}
-.metric{background:var(--bg);border-radius:8px;padding:10px 12px;}
-.m-label{font-size:10px;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;}
+/* METRICS ROW */
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--card);}
+.metric{padding:12px 14px;border-right:1px solid var(--border);}
+.metric:last-child{border-right:none;}
+.m-label{font-size:10px;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:5px;}
 .m-val{font-size:22px;font-weight:700;line-height:1;color:var(--text);}
-.m-val .unit{font-size:12px;font-weight:400;color:var(--muted);}
+.m-val .unit{font-size:11px;font-weight:400;color:var(--muted);margin-left:2px;}
 .m-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:5px;}
 .b-ok{background:var(--teal-light);color:var(--teal-dark);}
 .b-warn{background:var(--amber-light);color:var(--amber-dark);}
 .b-crit{background:var(--red-light);color:var(--red-dark);}
 .m-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+.trend-up{color:var(--red);}
+.trend-down{color:var(--teal);}
+.trend-flat{color:var(--muted);}
 
-/* CHART CARD */
+/* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:1rem;}
 .card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .card-title{font-size:14px;font-weight:600;}
-.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);}
 .legend-item{display:flex;align-items:center;gap:6px;}
-.legend-line{width:24px;height:3px;border-radius:2px;}
+.legend-line{width:22px;height:3px;border-radius:2px;}
 .chart-body{padding:16px;}
 .chart-wrap{position:relative;height:260px;}
 
 /* TABLE GRID */
 .table-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
 @media(max-width:860px){.table-grid{grid-template-columns:1fr;}}
-.tbl-title{font-size:13px;font-weight:600;padding:10px 14px;border-bottom:1px solid var(--border);}
-.tbl-wrap{overflow-y:auto;max-height:220px;}
+.tbl-title{font-size:13px;font-weight:600;padding:10px 16px;border-bottom:1px solid var(--border);}
+.tbl-wrap{overflow-y:auto;max-height:230px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{padding:7px 12px;text-align:left;font-size:11px;font-weight:600;position:sticky;top:0;background:var(--card);}
-thead th.n64{color:var(--blue-dark);}
-thead th.n1{color:var(--red-dark);}
+thead th{padding:7px 12px;text-align:left;font-size:11px;font-weight:600;position:sticky;top:0;background:var(--card);z-index:1;}
+thead th.n64-h{color:var(--blue-dark);}
+thead th.n1-h{color:var(--red-dark);}
 tbody tr{border-top:1px solid var(--border);}
 tbody tr:hover{background:var(--bg);}
 tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
-.td-t{color:var(--muted);}
-.c-ok{color:var(--teal);}
-.c-warn{color:var(--amber);}
-.c-crit{color:var(--red);}
+.td-t{color:var(--muted);font-size:11px;}
+.c-ok{color:var(--teal);font-weight:600;}
+.c-warn{color:var(--amber);font-weight:600;}
+.c-crit{color:var(--red);font-weight:600;}
 
-/* ERROR / LOADING */
-.err-box{background:var(--amber-light);border:1px solid rgba(186,117,23,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber-dark);margin-bottom:1rem;display:none;}
+/* LOADING */
 .loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;color:var(--muted);gap:10px;}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;}
+.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* REFRESH BTN */
-.btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+/* BUTTONS */
+.btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:5px;}
 .btn:hover{border-color:var(--blue);color:var(--blue);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
 
+/* FOOTER */
 .footer{text-align:center;font-size:11px;color:var(--muted);padding:1rem;border-top:1px solid var(--border);}
 .footer a{color:var(--blue);text-decoration:none;}
 </style>
@@ -122,50 +140,51 @@ tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
       <div class="h-sub">N.64 บ้านผาขวาง &nbsp;|&nbsp; N.1 สะพานพัฒนา (หน้าป่าไม้) &nbsp;|&nbsp; กรมชลประทานเขต 1</div>
     </div>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+  <div class="header-right">
     <div class="status-pill">
       <div class="dot loading" id="status-dot"></div>
       <span id="status-text">กำลังโหลด...</span>
     </div>
-    <div style="display:flex;gap:10px;font-size:11px;color:rgba(255,255,255,0.5)">
-      <span id="last-update"></span>
-      <span id="next-refresh" style="color:rgba(255,255,255,0.3)"></span>
-    </div>
+    <span class="last-upd" id="last-update"></span>
   </div>
 </div>
 
 <div class="wrap">
+
+  <div class="source-tag" id="source-tag">
+    <span id="source-name">—</span>
+    <span style="color:var(--muted)">กำลังเชื่อมต่อ...</span>
+  </div>
+
   <div class="err-box" id="err-box">⚠️ <span id="err-msg"></span></div>
 
   <!-- Station metrics -->
   <div class="stations">
-    <!-- N.64 -->
-    <div>
+    <div class="stn-block">
       <div class="stn-header n64">
         <div class="stn-dot n64"></div>
-        <span class="stn-name">N.64 บ้านผาขวาง</span>
+        <span class="stn-name n64">N.64 บ้านผาขวาง</span>
         <span class="stn-code">แม่น้ำน่านตอนบน</span>
       </div>
       <div class="metrics-row">
         <div class="metric">
           <div class="m-label">ระดับล่าสุด</div>
-          <div class="m-val" id="n64-latest">--<span class="unit"> ม.</span></div>
+          <div class="m-val" id="n64-latest">--<span class="unit">ม.</span></div>
           <div id="n64-badge" class="m-badge b-ok">--</div>
         </div>
         <div class="metric">
           <div class="m-label">สูงสุด 24 ชม.</div>
-          <div class="m-val" id="n64-max" style="color:var(--red)">--<span class="unit"> ม.</span></div>
+          <div class="m-val" id="n64-max" style="color:var(--red)">--<span class="unit">ม.</span></div>
           <div class="m-sub" id="n64-max-t">--</div>
         </div>
         <div class="metric">
-          <div class="m-label">ต่ำสุด 24 ชม.</div>
-          <div class="m-val" id="n64-min" style="color:var(--teal)">--<span class="unit"> ม.</span></div>
-          <div class="m-sub" id="n64-min-t">--</div>
+          <div class="m-label">แนวโน้ม</div>
+          <div class="m-val" id="n64-trend" style="font-size:18px">--</div>
+          <div class="m-sub" id="n64-change">--</div>
         </div>
       </div>
     </div>
-    <!-- N.1 -->
-    <div>
+    <div class="stn-block">
       <div class="stn-header n1">
         <div class="stn-dot n1"></div>
         <span class="stn-name n1">N.1 สะพานพัฒนา</span>
@@ -174,18 +193,18 @@ tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
       <div class="metrics-row">
         <div class="metric">
           <div class="m-label">ระดับล่าสุด</div>
-          <div class="m-val" id="n1-latest">--<span class="unit"> ม.</span></div>
+          <div class="m-val" id="n1-latest">--<span class="unit">ม.</span></div>
           <div id="n1-badge" class="m-badge b-ok">--</div>
         </div>
         <div class="metric">
           <div class="m-label">สูงสุด 24 ชม.</div>
-          <div class="m-val" id="n1-max" style="color:var(--red)">--<span class="unit"> ม.</span></div>
+          <div class="m-val" id="n1-max" style="color:var(--red)">--<span class="unit">ม.</span></div>
           <div class="m-sub" id="n1-max-t">--</div>
         </div>
         <div class="metric">
-          <div class="m-label">ต่ำสุด 24 ชม.</div>
-          <div class="m-val" id="n1-min" style="color:var(--teal)">--<span class="unit"> ม.</span></div>
-          <div class="m-sub" id="n1-min-t">--</div>
+          <div class="m-label">แนวโน้ม</div>
+          <div class="m-val" id="n1-trend" style="font-size:18px">--</div>
+          <div class="m-sub" id="n1-change">--</div>
         </div>
       </div>
     </div>
@@ -200,7 +219,9 @@ tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
           <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>N.64 บ้านผาขวาง</div>
           <div class="legend-item"><div class="legend-line" style="background:var(--red)"></div>N.1 หน้าป่าไม้</div>
         </div>
-        <button class="btn" onclick="loadData()">⟳ รีเฟรช</button>
+        <div class="btn-row">
+          <button class="btn" onclick="loadData()">⟳ รีเฟรช</button>
+        </div>
       </div>
     </div>
     <div class="chart-body">
@@ -211,59 +232,77 @@ tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
   <!-- Tables -->
   <div class="table-grid">
     <div class="card">
-      <div class="tbl-title" style="color:var(--blue-dark)">📋 N.64 บ้านผาขวาง — ข้อมูลรายชั่วโมง</div>
+      <div class="tbl-title" style="color:var(--blue-dark)">📋 N.64 บ้านผาขวาง — รายชั่วโมง</div>
       <div id="table-n64"><div class="loading-wrap"><div class="spinner"></div><span>กำลังโหลด...</span></div></div>
     </div>
     <div class="card">
-      <div class="tbl-title" style="color:var(--red-dark)">📋 N.1 สะพานพัฒนา — ข้อมูลรายชั่วโมง</div>
+      <div class="tbl-title" style="color:var(--red-dark)">📋 N.1 สะพานพัฒนา — รายชั่วโมง</div>
       <div id="table-n1"><div class="loading-wrap"><div class="spinner"></div><span>กำลังโหลด...</span></div></div>
     </div>
   </div>
 
   <div class="footer">
-    แหล่งข้อมูล: <a href="https://hydro-1.net/Data/HD-04/houly/hourly_level.php" target="_blank">hydro-1.net — สถานีอุทกวิทยา กรมชลประทานเขต 1</a>
-    &nbsp;|&nbsp; ข้อมูลอัปเดตรายชั่วโมง
+    แหล่งข้อมูล:
+    <a href="https://hydro1.ddns.net/?page=water_graph_test&fd=main/information_6/water_graph/&station1=N.64&station2=N.1&station3=N.13A&river_basin=ลุ่มน้ำน่าน" target="_blank">hydro1.ddns.net (หลัก)</a>
+    &nbsp;|&nbsp;
+    <a href="https://hydro-1.net/Data/HD-04/houly/hourly_level.php" target="_blank">hydro-1.net (สำรอง)</a>
+    &nbsp;|&nbsp; กรมชลประทานเขต 1
   </div>
 </div>
 
 <script>
-const SOURCE_URL = 'https://hydro-1.net/Data/HD-04/houly/hourly_level.php';
+// ==================== CONFIG ====================
+const URLS = {
+  primary: 'https://hydro1.ddns.net/?page=water_graph_test&fd=main/information_6/water_graph/&station1=N.64&station2=N.1&station3=N.13A&river_basin=%E0%B8%A5%E0%B8%B8%E0%B9%88%E0%B8%A1%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%99%E0%B9%88%E0%B8%B2%E0%B8%99',
+  backup:  'https://hydro-1.net/Data/HD-04/houly/hourly_level.php'
+};
+
 const PROXIES = [
   u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
   u => `https://corsproxy.io/?${encodeURIComponent(u)}`
 ];
 
-// ระดับเฝ้าระวัง — ปรับตามเกณฑ์จริงของสถานี
-const WARN = { n64: 3.5, n1: 2.8 };
-const CRIT = { n64: 5.0, n1: 4.5 };
+// ── ปรับค่าเกณฑ์ระดับน้ำให้ตรงตามสถานีจริง ──
+const WARN = { n64: 8.0, n1: 5.5 };
+const CRIT = { n64: 9.5, n1: 7.0 };
 
 let chartInst = null;
+let currentSource = '';
 
+// ==================== UI HELPERS ====================
 function setStatus(state, text) {
   const dot = document.getElementById('status-dot');
-  dot.className = 'dot ' + (state === 'ok' ? '' : state);
+  dot.className = 'dot' + (state !== 'ok' ? ' ' + state : '');
   document.getElementById('status-text').textContent = text;
 }
 
-function showErr(msg) {
+function showErr(msg, urls) {
   const b = document.getElementById('err-box');
-  document.getElementById('err-msg').innerHTML = msg + ' — <a href="' + SOURCE_URL + '" target="_blank" style="color:inherit;font-weight:600">เปิดเว็บต้นทาง</a>';
+  const linksHtml = urls ? urls.map(u => `<a href="${u}" target="_blank">${u}</a>`).join(' | ') : '';
+  document.getElementById('err-msg').innerHTML = msg + (linksHtml ? ' — ' + linksHtml : '');
   b.style.display = 'block';
 }
 
+function setSourceTag(name, detail) {
+  document.getElementById('source-name').textContent = name;
+  document.getElementById('source-tag').querySelector('span:last-child').textContent = detail;
+}
+
 function badge(level, stn) {
+  if (isNaN(level) || level <= 0) return { cls: 'b-ok', text: 'ไม่มีข้อมูล' };
   if (level >= CRIT[stn]) return { cls: 'b-crit', text: '🔴 วิกฤต' };
   if (level >= WARN[stn]) return { cls: 'b-warn', text: '🟡 เฝ้าระวัง' };
   return { cls: 'b-ok', text: '🟢 ปกติ' };
 }
 
 function levelClass(level, stn) {
+  if (isNaN(level) || level <= 0) return '';
   if (level >= CRIT[stn]) return 'c-crit';
   if (level >= WARN[stn]) return 'c-warn';
   return 'c-ok';
 }
 
-// ---- PARSE ----
+// ==================== PARSE ====================
 function parseTable(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const rows = doc.querySelectorAll('table tr');
@@ -272,109 +311,133 @@ function parseTable(html) {
   rows.forEach(row => {
     const cells = row.querySelectorAll('td');
     if (cells.length < 2) return;
-    const t = cells[0].textContent.trim();
-    // รับทั้งรูปแบบ "HH:MM" และ "DD/MM/YY HH:MM" หรือ "HH.MM น."
+
+    const timeText = cells[0].textContent.trim();
+    if (!/^\d{1,2}[:.]\d{2}/.test(timeText)) return;
+
+    const toNum = s => parseFloat((s || '').replace(/,/g, '')) || 0;
+
     if (cells.length >= 5) {
-      // multi-column: [time, n64_level, n64_flow, n1_level, n1_flow]
-      const n64l = parseFloat(cells[1].textContent);
-      const n64f = parseFloat(cells[2].textContent);
-      const n1l  = parseFloat(cells[3].textContent);
-      const n1f  = parseFloat(cells[4].textContent);
-      if (!isNaN(n64l) || !isNaN(n1l)) {
-        data.push({ time: t, n64_level: n64l||0, n64_flow: n64f||0, n1_level: n1l||0, n1_flow: n1f||0 });
+      // โครงสร้าง: [เวลา, ระดับN.64, ปริมาณN.64, ระดับN.1, ปริมาณN.1]
+      const n64l = toNum(cells[1].textContent);
+      const n64f = toNum(cells[2].textContent);
+      const n1l  = toNum(cells[3].textContent);
+      const n1f  = toNum(cells[4].textContent);
+      if (n64l > 0 || n1l > 0) {
+        data.push({ time: timeText.replace('.', ':'), n64_level: n64l, n64_flow: n64f, n1_level: n1l, n1_flow: n1f });
       }
     } else if (cells.length >= 2) {
-      // single-column fallback
-      const lv = parseFloat(cells[1].textContent);
-      if (!isNaN(lv)) data.push({ time: t, n64_level: lv, n64_flow: 0, n1_level: lv, n1_flow: 0 });
+      // fallback: ตารางคอลัมน์เดียว
+      const lv = toNum(cells[1].textContent);
+      const fl = cells[2] ? toNum(cells[2].textContent) : 0;
+      if (lv > 0) {
+        data.push({ time: timeText.replace('.', ':'), n64_level: lv, n64_flow: fl, n1_level: lv, n1_flow: fl });
+      }
     }
   });
-  return data;
+
+  return data.length >= 3 ? data : null;
 }
 
-// Try multiple parameter combos
-const FETCH_VARIANTS = [
-  { method: 'POST', body: 'menu=1&stn_group=4&submit=%E0%B8%95%E0%B8%81%E0%B8%A5%E0%B8%87' },
-  { method: 'GET',  params: '?menu=1&stn_group=4' },
-  { method: 'GET',  params: '?stn=N.64' },
-  { method: 'GET',  params: '' }
-];
-
+// ==================== FETCH ====================
 async function tryFetch() {
-  for (const variant of FETCH_VARIANTS) {
+  const attempts = [
+    { url: URLS.primary, label: 'hydro1.ddns.net', method: 'GET' },
+    { url: URLS.backup,  label: 'hydro-1.net', method: 'GET' },
+    { url: URLS.backup,  label: 'hydro-1.net (POST)', method: 'POST', body: 'menu=1&stn_group=4&submit=%E0%B8%95%E0%B8%81%E0%B8%A5%E0%B8%87' }
+  ];
+
+  for (const attempt of attempts) {
     for (const makeProxy of PROXIES) {
       try {
-        const targetUrl = SOURCE_URL + (variant.params || '');
-        const proxyUrl = makeProxy(targetUrl);
-        const opts = { signal: AbortSignal.timeout(10000) };
-        if (variant.method === 'POST') {
+        const proxyUrl = makeProxy(attempt.url);
+        const opts = { signal: AbortSignal.timeout(12000) };
+        if (attempt.method === 'POST') {
           opts.method = 'POST';
           opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-          opts.body = variant.body;
+          opts.body = attempt.body;
         }
         const res = await fetch(proxyUrl, opts);
         if (!res.ok) continue;
         const json = await res.json();
         const html = json.contents || json;
-        if (typeof html === 'string' && html.length > 200) return html;
-      } catch(e) { /* try next */ }
+        if (typeof html !== 'string' || html.length < 300) continue;
+        const data = parseTable(html);
+        if (data) {
+          currentSource = attempt.label;
+          return data;
+        }
+      } catch(e) { /* ลองต่อ */ }
     }
   }
   return null;
 }
 
-// ---- METRICS ----
+// ==================== METRICS ====================
 function updateMetrics(data) {
   if (!data.length) return;
-  const latest = data[0];
-
   ['n64','n1'].forEach(stn => {
     const key = stn + '_level';
     const levels = data.map(d => d[key]).filter(v => v > 0);
     if (!levels.length) return;
-    const max = Math.max(...levels), min = Math.min(...levels);
-    const maxItem = data.find(d => d[key] === max);
-    const minItem = data.find(d => d[key] === min);
-    const lv = latest[key];
 
-    document.getElementById(stn + '-latest').innerHTML = `${lv.toFixed(2)}<span class="unit"> ม.</span>`;
-    const b = badge(lv, stn);
+    const latest = data[0][key];
+    const prev   = data[1] ? data[1][key] : latest;
+    const max    = Math.max(...levels);
+    const maxItem = data.find(d => d[key] === max);
+    const change = latest - prev;
+
+    // ระดับ + badge
+    document.getElementById(stn + '-latest').innerHTML = `${latest.toFixed(2)}<span class="unit"> ม.</span>`;
+    const b = badge(latest, stn);
     const bEl = document.getElementById(stn + '-badge');
     bEl.className = 'm-badge ' + b.cls;
     bEl.textContent = b.text;
 
+    // สูงสุด
     document.getElementById(stn + '-max').innerHTML = `${max.toFixed(2)}<span class="unit"> ม.</span>`;
     document.getElementById(stn + '-max-t').textContent = maxItem?.time || '--';
-    document.getElementById(stn + '-min').innerHTML = `${min.toFixed(2)}<span class="unit"> ม.</span>`;
-    document.getElementById(stn + '-min-t').textContent = minItem?.time || '--';
+
+    // แนวโน้ม
+    const tEl = document.getElementById(stn + '-trend');
+    const cEl = document.getElementById(stn + '-change');
+    if (change > 0.01) {
+      tEl.textContent = '↑ สูงขึ้น'; tEl.className = 'm-val trend-up';
+      cEl.textContent = `+${change.toFixed(2)} ม.`;
+    } else if (change < -0.01) {
+      tEl.textContent = '↓ ลดลง'; tEl.className = 'm-val trend-down';
+      cEl.textContent = `${change.toFixed(2)} ม.`;
+    } else {
+      tEl.textContent = '→ คงที่'; tEl.className = 'm-val trend-flat';
+      cEl.textContent = 'จากชั่วโมงก่อน';
+    }
   });
 }
 
-// ---- CHART ----
+// ==================== CHART ====================
 function updateChart(data) {
   const rev = [...data].reverse();
-  const labels = rev.map(d => d.time);
   const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
   const grid = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-  const tc = isDark ? '#7a9ab8' : '#5a6e84';
+  const tc   = isDark ? '#7a9ab8' : '#5a6e84';
 
   if (chartInst) chartInst.destroy();
   chartInst = new Chart(document.getElementById('chart-main'), {
     type: 'line',
     data: {
-      labels,
+      labels: rev.map(d => d.time),
       datasets: [
         {
           label: 'N.64 บ้านผาขวาง (ม.)',
-          data: rev.map(d => d.n64_level || null),
+          data: rev.map(d => d.n64_level > 0 ? d.n64_level : null),
           borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,0.07)',
           borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
           fill: true, tension: 0.4, spanGaps: true
         },
         {
           label: 'N.1 หน้าป่าไม้ (ม.)',
-          data: rev.map(d => d.n1_level || null),
-          borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.05)',
+          data: rev.map(d => d.n1_level > 0 ? d.n1_level : null),
+          borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.04)',
           borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
           fill: false, tension: 0.4, spanGaps: true
         }
@@ -389,8 +452,13 @@ function updateChart(data) {
           backgroundColor: isDark ? '#1e2f42' : '#fff',
           borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           borderWidth: 1, titleColor: tc,
+          titleFont: { size: 11 },
+          bodyFont: { size: 13 },
           callbacks: {
-            label: ctx => ` ${ctx.dataset.label.split(' ')[0]}: ${ctx.parsed.y?.toFixed(2) ?? '--'} ม.`
+            label: ctx => {
+              const v = ctx.parsed.y;
+              return ` ${ctx.dataset.label.split(' (')[0]}: ${v != null ? v.toFixed(2) : '--'} ม.`;
+            }
           }
         }
       },
@@ -402,23 +470,22 @@ function updateChart(data) {
   });
 }
 
-// ---- TABLES ----
+// ==================== TABLES ====================
 function buildTable(data, stn) {
-  const key = stn + '_level';
-  const fkey = stn + '_flow';
-  const isN64 = stn === 'n64';
+  const lKey = stn + '_level', fKey = stn + '_flow';
+  const hCls = stn + '-h';
   let html = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th class="td-t">เวลา</th>
-      <th class="${stn}">ระดับ (ม.รทก.)</th>
-      <th class="${stn}">ปริมาณ (ลบ.ม./วิ)</th>
+      <th class="${hCls}">ระดับ (ม.รทก.)</th>
+      <th class="${hCls}">ปริมาณ (ลบ.ม./วิ)</th>
     </tr></thead><tbody>`;
   data.slice(0, 24).forEach(row => {
-    const lv = row[key], fl = row[fkey];
+    const lv = row[lKey], fl = row[fKey];
     const cls = levelClass(lv, stn);
     html += `<tr>
       <td class="td-t">${row.time}</td>
-      <td class="${cls}" style="font-weight:600">${lv > 0 ? lv.toFixed(2) : '--'}</td>
+      <td class="${cls}">${lv > 0 ? lv.toFixed(2) : '--'}</td>
       <td style="color:var(--muted)">${fl > 0 ? fl.toFixed(1) : '--'}</td>
     </tr>`;
   });
@@ -426,39 +493,47 @@ function buildTable(data, stn) {
   document.getElementById('table-' + stn).innerHTML = html;
 }
 
-// ---- DEMO DATA ----
+// ==================== DEMO DATA ====================
 function demoData() {
   const now = new Date();
   return Array.from({ length: 24 }, (_, i) => {
     const t = new Date(now - i * 3600000);
     const ts = t.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
-    const n64 = 2.6 + Math.sin(i * 0.45) * 0.7 + Math.random() * 0.15;
-    const n1  = 1.8 + Math.sin(i * 0.45 + 1.2) * 0.5 + Math.random() * 0.1;
-    return { time: ts, n64_level: +n64.toFixed(2), n64_flow: +(n64 * 18 + Math.random() * 5).toFixed(1), n1_level: +n1.toFixed(2), n1_flow: +(n1 * 14 + Math.random() * 3).toFixed(1) };
+    const n64 = 6.8 + Math.sin(i * 0.45) * 1.2 + Math.random() * 0.2;
+    const n1  = 4.2 + Math.sin(i * 0.45 + 1.0) * 0.8 + Math.random() * 0.15;
+    return {
+      time: ts,
+      n64_level: +n64.toFixed(2), n64_flow: +(n64 * 45 + Math.random() * 8).toFixed(1),
+      n1_level:  +n1.toFixed(2),  n1_flow:  +(n1  * 28 + Math.random() * 5).toFixed(1)
+    };
   });
 }
 
-// ---- MAIN ----
+// ==================== MAIN ====================
 async function loadData() {
-  setStatus('loading', 'กำลังโหลดข้อมูล...');
+  setStatus('loading', 'กำลังเชื่อมต่อศูนย์อุทกวิทยา...');
   document.getElementById('err-box').style.display = 'none';
 
-  const html = await tryFetch();
-  let data;
+  // reset loading state in tables
+  ['n64','n1'].forEach(s => {
+    document.getElementById('table-' + s).innerHTML =
+      '<div class="loading-wrap"><div class="spinner"></div><span>กำลังโหลด...</span></div>';
+  });
 
-  if (!html) {
-    showErr('ดึงข้อมูลจากเว็บต้นทางไม่ได้ แสดงข้อมูลตัวอย่าง');
+  let data = await tryFetch();
+
+  if (!data) {
+    showErr(
+      'ดึงข้อมูลสดไม่ได้ (proxy อาจถูกบล็อก หรือเว็บเปลี่ยนโครงสร้าง) — แสดงข้อมูลตัวอย่าง',
+      [URLS.primary, URLS.backup]
+    );
     data = demoData();
+    currentSource = 'ข้อมูลตัวอย่าง';
     setStatus('error', 'ข้อมูลตัวอย่าง');
+    setSourceTag('Demo', 'ไม่สามารถเชื่อมต่อได้');
   } else {
-    data = parseTable(html);
-    if (!data.length || data.every(d => d.n64_level === 0 && d.n1_level === 0)) {
-      showErr('อ่านตารางได้ แต่โครงสร้างคอลัมน์อาจเปลี่ยนแปลง กำลังใช้ข้อมูลตัวอย่าง');
-      data = demoData();
-      setStatus('error', 'โครงสร้างตารางไม่ตรง');
-    } else {
-      setStatus('ok', 'อัปเดตแล้ว');
-    }
+    setStatus('ok', 'อัปเดตแล้ว');
+    setSourceTag(currentSource, 'เชื่อมต่อสำเร็จ');
   }
 
   updateMetrics(data);
@@ -466,31 +541,12 @@ async function loadData() {
   buildTable(data, 'n64');
   buildTable(data, 'n1');
 
-  const now = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-  document.getElementById('last-update').textContent = 'อัปเดต ' + now;
-  startCountdown(30 * 60);
-}
-
-// ---- COUNTDOWN ----
-let countdownTimer = null;
-function startCountdown(seconds) {
-  if (countdownTimer) clearInterval(countdownTimer);
-  let remaining = seconds;
-  function tick() {
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    const pad = n => String(n).padStart(2, '0');
-    const nextEl = document.getElementById('next-refresh');
-    if (nextEl) nextEl.textContent = `รอบถัดไป ${pad(m)}:${pad(s)} น.`;
-    if (remaining <= 0) clearInterval(countdownTimer);
-    remaining--;
-  }
-  tick();
-  countdownTimer = setInterval(tick, 1000);
+  document.getElementById('last-update').textContent =
+    'อัปเดต ' + new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
 }
 
 loadData();
-setInterval(loadData, 30 * 60 * 1000);
+setInterval(loadData, 30 * 60 * 1000); // รีเฟรชทุก 30 นาที
 </script>
 </body>
 </html>
