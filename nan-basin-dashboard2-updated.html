@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระดับน้ำลุ่มน้ำน่าน | N.64 & N.1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f0f4f8; --card: #ffffff; --text: #1a2636; --muted: #5a6e84;
+  --border: rgba(0,0,0,0.07); --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  --blue: #378ADD; --red: #E24B4A; --teal: #1D9E75; --amber: #BA7517;
+  --blue-light: #E6F1FB; --red-light: #FCEBEB; --teal-light: #E1F5EE; --amber-light: #FAEEDA;
+  --blue-dark: #0C447C; --red-dark: #791F1F; --teal-dark: #085041; --amber-dark: #633806;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1a26;--card:#162232;--text:#ddeaf8;--muted:#7a9ab8;
+    --border:rgba(255,255,255,0.07);--shadow:0 2px 16px rgba(0,0,0,0.35);
+    --blue-light:rgba(55,138,221,0.15);--red-light:rgba(226,75,74,0.15);
+    --teal-light:rgba(29,158,117,0.15);--amber-light:rgba(186,117,23,0.15);
+    --blue-dark:#85B7EB;--red-dark:#F09595;--teal-dark:#5DCAA5;--amber-dark:#EF9F27;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#042C53 0%,#0C447C 55%,#185FA5 100%);
+  padding:1.25rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.header-icon{width:46px;height:46px;background:rgba(255,255,255,0.13);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.h-title{color:#fff;font-size:18px;font-weight:600;line-height:1.3;}
+.h-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-top:2px;}
+.status-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border-radius:20px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,0.85);}
+.dot{width:7px;height:7px;border-radius:50%;background:#5DCAA5;}
+.dot.loading{background:#EF9F27;animation:blink 1s infinite;}
+.dot.error{background:#E24B4A;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* LAYOUT */
+.wrap{max-width:1280px;margin:0 auto;padding:1.25rem 1.5rem;}
+
+/* STATION SECTIONS */
+.stations{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+@media(max-width:860px){.stations{grid-template-columns:1fr;}}
+
+.stn-header{
+  border-radius:12px 12px 0 0;padding:10px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.stn-header.n64{background:var(--blue-light);}
+.stn-header.n1{background:var(--red-light);}
+.stn-dot{width:10px;height:10px;border-radius:50%;}
+.stn-dot.n64{background:var(--blue);}
+.stn-dot.n1{background:var(--red);}
+.stn-name{font-size:14px;font-weight:600;color:var(--blue-dark);}
+.stn-name.n1{color:var(--red-dark);}
+.stn-code{font-size:11px;color:var(--muted);margin-left:auto;}
+
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;box-shadow:var(--shadow);}
+.metric{background:var(--bg);border-radius:8px;padding:10px 12px;}
+.m-label{font-size:10px;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;}
+.m-val{font-size:22px;font-weight:700;line-height:1;color:var(--text);}
+.m-val .unit{font-size:12px;font-weight:400;color:var(--muted);}
+.m-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:5px;}
+.b-ok{background:var(--teal-light);color:var(--teal-dark);}
+.b-warn{background:var(--amber-light);color:var(--amber-dark);}
+.b-crit{background:var(--red-light);color:var(--red-dark);}
+.m-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* CHART CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:1rem;}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:600;}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-line{width:24px;height:3px;border-radius:2px;}
+.chart-body{padding:16px;}
+.chart-wrap{position:relative;height:260px;}
+
+/* TABLE GRID */
+.table-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+@media(max-width:860px){.table-grid{grid-template-columns:1fr;}}
+.tbl-title{font-size:13px;font-weight:600;padding:10px 14px;border-bottom:1px solid var(--border);}
+.tbl-wrap{overflow-y:auto;max-height:220px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:7px 12px;text-align:left;font-size:11px;font-weight:600;position:sticky;top:0;background:var(--card);}
+thead th.n64{color:var(--blue-dark);}
+thead th.n1{color:var(--red-dark);}
+tbody tr{border-top:1px solid var(--border);}
+tbody tr:hover{background:var(--bg);}
+tbody td{padding:7px 12px;font-variant-numeric:tabular-nums;}
+.td-t{color:var(--muted);}
+.c-ok{color:var(--teal);}
+.c-warn{color:var(--amber);}
+.c-crit{color:var(--red);}
+
+/* ERROR / LOADING */
+.err-box{background:var(--amber-light);border:1px solid rgba(186,117,23,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber-dark);margin-bottom:1rem;display:none;}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;color:var(--muted);gap:10px;}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* REFRESH BTN */
+.btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+.btn:hover{border-color:var(--blue);color:var(--blue);}
+
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:1rem;border-top:1px solid var(--border);}
+.footer a{color:var(--blue);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">🌊</div>
+    <div>
+      <div class="h-title">ระดับน้ำลุ่มน้ำน่าน รายชั่วโมง</div>
+      <div class="h-sub">N.64 บ้านผาขวาง &nbsp;|&nbsp; N.1 สะพานพัฒนา (หน้าป่าไม้) &nbsp;|&nbsp; กรมชลประทานเขต 1</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+    <div class="status-pill">
+      <div class="dot loading" id="status-dot"></div>
+      <span id="status-text">กำลังโหลด...</span>
+    </div>
+    <div style="display:flex;gap:10px;font-size:11px;color:rgba(255,255,255,0.5)">
+      <span id="last-update"></span>
+      <span id="next-refresh" style="color:rgba(255,255,255,0.3)"></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="err-box" id="err-box">⚠️ <span id="err-msg"></span></div>
+
+  <!-- Station metrics -->
+  <div class="stations">
+    <!-- N.64 -->
+    <div>
+      <div class="stn-header n64">
+        <div class="stn-dot n64"></div>
+        <span class="stn-name">N.64 บ้านผาขวาง</span>
+        <span class="stn-code">แม่น้ำน่านตอนบน</span>
+      </div>
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="m-label">ระดับล่าสุด</div>
+          <div class="m-val" id="n64-latest">--<span class="unit"> ม.</span></div>
+          <div id="n64-badge" class="m-badge b-ok">--</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">สูงสุด 24 ชม.</div>
+          <div class="m-val" id="n64-max" style="color:var(--red)">--<span class="unit"> ม.</span></div>
+          <div class="m-sub" id="n64-max-t">--</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">ต่ำสุด 24 ชม.</div>
+          <div class="m-val" id="n64-min" style="color:var(--teal)">--<span class="unit"> ม.</span></div>
+          <div class="m-sub" id="n64-min-t">--</div>
+        </div>
+      </div>
+    </div>
+    <!-- N.1 -->
+    <div>
+      <div class="stn-header n1">
+        <div class="stn-dot n1"></div>
+        <span class="stn-name n1">N.1 สะพานพัฒนา</span>
+        <span class="stn-code">หน้าสำนักงานป่าไม้</span>
+      </div>
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="m-label">ระดับล่าสุด</div>
+          <div class="m-val" id="n1-latest">--<span class="unit"> ม.</span></div>
+          <div id="n1-badge" class="m-badge b-ok">--</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">สูงสุด 24 ชม.</div>
+          <div class="m-val" id="n1-max" style="color:var(--red)">--<span class="unit"> ม.</span></div>
+          <div class="m-sub" id="n1-max-t">--</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">ต่ำสุด 24 ชม.</div>
+          <div class="m-val" id="n1-min" style="color:var(--teal)">--<span class="unit"> ม.</span></div>
+          <div class="m-sub" id="n1-min-t">--</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">📈 กราฟเปรียบเทียบระดับน้ำ 2 สถานี</span>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>N.64 บ้านผาขวาง</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--red)"></div>N.1 หน้าป่าไม้</div>
+        </div>
+        <button class="btn" onclick="loadData()">⟳ รีเฟรช</button>
+      </div>
+    </div>
+    <div class="chart-body">
+      <div class="chart-wrap"><canvas id="chart-main"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tables -->
+  <div class="table-grid">
+    <div class="card">
+      <div class="tbl-title" style="color:var(--blue-dark)">📋 N.64 บ้านผาขวาง — ข้อมูลรายชั่วโมง</div>
+      <div id="table-n64"><div class="loading-wrap"><div class="spinner"></div><span>กำลังโหลด...</span></div></div>
+    </div>
+    <div class="card">
+      <div class="tbl-title" style="color:var(--red-dark)">📋 N.1 สะพานพัฒนา — ข้อมูลรายชั่วโมง</div>
+      <div id="table-n1"><div class="loading-wrap"><div class="spinner"></div><span>กำลังโหลด...</span></div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    แหล่งข้อมูล: <a href="https://hydro-1.net/Data/HD-04/houly/hourly_level.php" target="_blank">hydro-1.net — สถานีอุทกวิทยา กรมชลประทานเขต 1</a>
+    &nbsp;|&nbsp; ข้อมูลอัปเดตรายชั่วโมง
+  </div>
+</div>
+
+<script>
+const SOURCE_URL = 'https://hydro-1.net/Data/HD-04/houly/hourly_level.php';
+const PROXIES = [
+  u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`
+];
+
+// ระดับเฝ้าระวัง — ปรับตามเกณฑ์จริงของสถานี
+const WARN = { n64: 3.5, n1: 2.8 };
+const CRIT = { n64: 5.0, n1: 4.5 };
+
+let chartInst = null;
+
+function setStatus(state, text) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'dot ' + (state === 'ok' ? '' : state);
+  document.getElementById('status-text').textContent = text;
+}
+
+function showErr(msg) {
+  const b = document.getElementById('err-box');
+  document.getElementById('err-msg').innerHTML = msg + ' — <a href="' + SOURCE_URL + '" target="_blank" style="color:inherit;font-weight:600">เปิดเว็บต้นทาง</a>';
+  b.style.display = 'block';
+}
+
+function badge(level, stn) {
+  if (level >= CRIT[stn]) return { cls: 'b-crit', text: '🔴 วิกฤต' };
+  if (level >= WARN[stn]) return { cls: 'b-warn', text: '🟡 เฝ้าระวัง' };
+  return { cls: 'b-ok', text: '🟢 ปกติ' };
+}
+
+function levelClass(level, stn) {
+  if (level >= CRIT[stn]) return 'c-crit';
+  if (level >= WARN[stn]) return 'c-warn';
+  return 'c-ok';
+}
+
+// ---- PARSE ----
+function parseTable(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const rows = doc.querySelectorAll('table tr');
+  const data = [];
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 2) return;
+    const t = cells[0].textContent.trim();
+    // รับทั้งรูปแบบ "HH:MM" และ "DD/MM/YY HH:MM" หรือ "HH.MM น."
+    if (cells.length >= 5) {
+      // multi-column: [time, n64_level, n64_flow, n1_level, n1_flow]
+      const n64l = parseFloat(cells[1].textContent);
+      const n64f = parseFloat(cells[2].textContent);
+      const n1l  = parseFloat(cells[3].textContent);
+      const n1f  = parseFloat(cells[4].textContent);
+      if (!isNaN(n64l) || !isNaN(n1l)) {
+        data.push({ time: t, n64_level: n64l||0, n64_flow: n64f||0, n1_level: n1l||0, n1_flow: n1f||0 });
+      }
+    } else if (cells.length >= 2) {
+      // single-column fallback
+      const lv = parseFloat(cells[1].textContent);
+      if (!isNaN(lv)) data.push({ time: t, n64_level: lv, n64_flow: 0, n1_level: lv, n1_flow: 0 });
+    }
+  });
+  return data;
+}
+
+// Try multiple parameter combos
+const FETCH_VARIANTS = [
+  { method: 'POST', body: 'menu=1&stn_group=4&submit=%E0%B8%95%E0%B8%81%E0%B8%A5%E0%B8%87' },
+  { method: 'GET',  params: '?menu=1&stn_group=4' },
+  { method: 'GET',  params: '?stn=N.64' },
+  { method: 'GET',  params: '' }
+];
+
+async function tryFetch() {
+  for (const variant of FETCH_VARIANTS) {
+    for (const makeProxy of PROXIES) {
+      try {
+        const targetUrl = SOURCE_URL + (variant.params || '');
+        const proxyUrl = makeProxy(targetUrl);
+        const opts = { signal: AbortSignal.timeout(10000) };
+        if (variant.method === 'POST') {
+          opts.method = 'POST';
+          opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+          opts.body = variant.body;
+        }
+        const res = await fetch(proxyUrl, opts);
+        if (!res.ok) continue;
+        const json = await res.json();
+        const html = json.contents || json;
+        if (typeof html === 'string' && html.length > 200) return html;
+      } catch(e) { /* try next */ }
+    }
+  }
+  return null;
+}
+
+// ---- METRICS ----
+function updateMetrics(data) {
+  if (!data.length) return;
+  const latest = data[0];
+
+  ['n64','n1'].forEach(stn => {
+    const key = stn + '_level';
+    const levels = data.map(d => d[key]).filter(v => v > 0);
+    if (!levels.length) return;
+    const max = Math.max(...levels), min = Math.min(...levels);
+    const maxItem = data.find(d => d[key] === max);
+    const minItem = data.find(d => d[key] === min);
+    const lv = latest[key];
+
+    document.getElementById(stn + '-latest').innerHTML = `${lv.toFixed(2)}<span class="unit"> ม.</span>`;
+    const b = badge(lv, stn);
+    const bEl = document.getElementById(stn + '-badge');
+    bEl.className = 'm-badge ' + b.cls;
+    bEl.textContent = b.text;
+
+    document.getElementById(stn + '-max').innerHTML = `${max.toFixed(2)}<span class="unit"> ม.</span>`;
+    document.getElementById(stn + '-max-t').textContent = maxItem?.time || '--';
+    document.getElementById(stn + '-min').innerHTML = `${min.toFixed(2)}<span class="unit"> ม.</span>`;
+    document.getElementById(stn + '-min-t').textContent = minItem?.time || '--';
+  });
+}
+
+// ---- CHART ----
+function updateChart(data) {
+  const rev = [...data].reverse();
+  const labels = rev.map(d => d.time);
+  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const grid = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const tc = isDark ? '#7a9ab8' : '#5a6e84';
+
+  if (chartInst) chartInst.destroy();
+  chartInst = new Chart(document.getElementById('chart-main'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'N.64 บ้านผาขวาง (ม.)',
+          data: rev.map(d => d.n64_level || null),
+          borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,0.07)',
+          borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
+          fill: true, tension: 0.4, spanGaps: true
+        },
+        {
+          label: 'N.1 หน้าป่าไม้ (ม.)',
+          data: rev.map(d => d.n1_level || null),
+          borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.05)',
+          borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
+          fill: false, tension: 0.4, spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#1e2f42' : '#fff',
+          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+          borderWidth: 1, titleColor: tc,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label.split(' ')[0]}: ${ctx.parsed.y?.toFixed(2) ?? '--'} ม.`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: grid }, ticks: { color: tc, font: { size: 10 }, maxTicksLimit: 14, maxRotation: 45 } },
+        y: { grid: { color: grid }, ticks: { color: tc, font: { size: 11 }, callback: v => v.toFixed(1) + ' ม.' } }
+      }
+    }
+  });
+}
+
+// ---- TABLES ----
+function buildTable(data, stn) {
+  const key = stn + '_level';
+  const fkey = stn + '_flow';
+  const isN64 = stn === 'n64';
+  let html = `<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th class="td-t">เวลา</th>
+      <th class="${stn}">ระดับ (ม.รทก.)</th>
+      <th class="${stn}">ปริมาณ (ลบ.ม./วิ)</th>
+    </tr></thead><tbody>`;
+  data.slice(0, 24).forEach(row => {
+    const lv = row[key], fl = row[fkey];
+    const cls = levelClass(lv, stn);
+    html += `<tr>
+      <td class="td-t">${row.time}</td>
+      <td class="${cls}" style="font-weight:600">${lv > 0 ? lv.toFixed(2) : '--'}</td>
+      <td style="color:var(--muted)">${fl > 0 ? fl.toFixed(1) : '--'}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('table-' + stn).innerHTML = html;
+}
+
+// ---- DEMO DATA ----
+function demoData() {
+  const now = new Date();
+  return Array.from({ length: 24 }, (_, i) => {
+    const t = new Date(now - i * 3600000);
+    const ts = t.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const n64 = 2.6 + Math.sin(i * 0.45) * 0.7 + Math.random() * 0.15;
+    const n1  = 1.8 + Math.sin(i * 0.45 + 1.2) * 0.5 + Math.random() * 0.1;
+    return { time: ts, n64_level: +n64.toFixed(2), n64_flow: +(n64 * 18 + Math.random() * 5).toFixed(1), n1_level: +n1.toFixed(2), n1_flow: +(n1 * 14 + Math.random() * 3).toFixed(1) };
+  });
+}
+
+// ---- MAIN ----
+async function loadData() {
+  setStatus('loading', 'กำลังโหลดข้อมูล...');
+  document.getElementById('err-box').style.display = 'none';
+
+  const html = await tryFetch();
+  let data;
+
+  if (!html) {
+    showErr('ดึงข้อมูลจากเว็บต้นทางไม่ได้ แสดงข้อมูลตัวอย่าง');
+    data = demoData();
+    setStatus('error', 'ข้อมูลตัวอย่าง');
+  } else {
+    data = parseTable(html);
+    if (!data.length || data.every(d => d.n64_level === 0 && d.n1_level === 0)) {
+      showErr('อ่านตารางได้ แต่โครงสร้างคอลัมน์อาจเปลี่ยนแปลง กำลังใช้ข้อมูลตัวอย่าง');
+      data = demoData();
+      setStatus('error', 'โครงสร้างตารางไม่ตรง');
+    } else {
+      setStatus('ok', 'อัปเดตแล้ว');
+    }
+  }
+
+  updateMetrics(data);
+  updateChart(data);
+  buildTable(data, 'n64');
+  buildTable(data, 'n1');
+
+  const now = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+  document.getElementById('last-update').textContent = 'อัปเดต ' + now;
+  startCountdown(30 * 60);
+}
+
+// ---- COUNTDOWN ----
+let countdownTimer = null;
+function startCountdown(seconds) {
+  if (countdownTimer) clearInterval(countdownTimer);
+  let remaining = seconds;
+  function tick() {
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    const pad = n => String(n).padStart(2, '0');
+    const nextEl = document.getElementById('next-refresh');
+    if (nextEl) nextEl.textContent = `รอบถัดไป ${pad(m)}:${pad(s)} น.`;
+    if (remaining <= 0) clearInterval(countdownTimer);
+    remaining--;
+  }
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+loadData();
+setInterval(loadData, 30 * 60 * 1000);
+</script>
+</body>
+</html>
